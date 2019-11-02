@@ -17,10 +17,31 @@ use core::panic::PanicInfo;
 // ────────────────────────────────────────────────────────────
 //
 
+static HELLO: &[u8] = b"Hello World!"; // What we're going to print to the screen
+
 #[no_mangle] // Make sure we output the function name as "_start"
 // This is our system entry function. "_start" is the default entry point name for most systems
 // extern "C" specifics to use C calling convention for this function (https://en.wikipedia.org/wiki/Calling_convention)
 pub extern "C" fn _start() -> ! {
+    // The VGA buffer is located at address 0xb8000 and that each character cell consists of an ASCII byte and a color byte.
+    // Cast the integer 0xb8000 into a raw pointer.
+    let vga_buffer = 0xb8000 as *mut u8;
+
+    for (i, &byte) in HELLO.iter().enumerate() {
+        // By using an unsafe block we're basically telling the compiler that we are absolutely sure that the operations are valid.
+        // This is not something we want to do necessarily
+        unsafe {
+            // Unsafe allows for:
+            // - Dereference a raw pointer
+            // - Call an unsafe function or method
+            // - Access or modify a mutable static variable
+            // - Implement an unsafe trait
+            *vga_buffer.offset(i as isize * 2) = byte; // write the string byte
+            *vga_buffer.offset(i as isize * 2 + 1) = 0xb; // 0xb is a light cyan
+        }
+    }
+
+
     // The function should never return, so it is marked as a diverging function by returning the “never” type !.
     loop {}
 }
