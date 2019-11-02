@@ -1,4 +1,8 @@
+// Remove standard library linking
 #![no_std]
+ // Remove having to have the main function defined, as we will not have
+ // access to the Rust runtime or C runtime library (crt0)
+#![no_main]
 
 // Add in core panic
 use core::panic::PanicInfo;
@@ -12,7 +16,4 @@ fn panic(_info: &PanicInfo) -> ! { // The PanicInfo parameter contains the file 
 
     // We can't do anything with it yet, so just loop
     loop {}
-}
-
-fn main() {
 }
